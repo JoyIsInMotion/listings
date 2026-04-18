@@ -1,0 +1,1 @@
+Web site for selling books using with React, Vite, TypeScript, Tailwind, React Router and Supabase (Auth + DB + Storage)

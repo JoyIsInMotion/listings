@@ -1,36 +1,39 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 
-type LocationState = {
-  from?: string
-}
-
-export function LoginPage() {
-  const { login } = useAuth()
+export function RegisterPage() {
+  const { register } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
+  const [name, setName] = useState('New Seller')
   const [email, setEmail] = useState('seller@example.com')
-
-  const from = (location.state as LocationState | null)?.from ?? '/dashboard'
 
   return (
     <section className="mx-auto w-full max-w-lg space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
-          Login
+          Register
         </h1>
-        <p className="text-slate-600">Sign in to manage your books and listings.</p>
+        <p className="text-slate-600">Create an account to start listing books.</p>
       </div>
 
       <form
         className="space-y-4"
         onSubmit={(event) => {
           event.preventDefault()
-          login(email)
-          navigate(from, { replace: true })
+          register(name, email)
+          navigate('/dashboard')
         }}
       >
+        <label className="block space-y-1">
+          <span className="text-sm font-semibold text-slate-700">Name</span>
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
+          />
+        </label>
+
         <label className="block space-y-1">
           <span className="text-sm font-semibold text-slate-700">Email</span>
           <input
@@ -44,14 +47,14 @@ export function LoginPage() {
           type="submit"
           className="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
         >
-          Login
+          Create account
         </button>
       </form>
 
       <p className="text-center text-sm text-slate-600">
-        No account yet?{' '}
-        <Link to="/register" className="font-semibold text-sky-700 hover:text-sky-800">
-          Register
+        Already have an account?{' '}
+        <Link to="/login" className="font-semibold text-sky-700 hover:text-sky-800">
+          Login
         </Link>
       </p>
     </section>

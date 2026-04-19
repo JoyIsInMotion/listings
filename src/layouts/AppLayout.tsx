@@ -1,13 +1,15 @@
 import { Outlet } from 'react-router-dom'
-import { SiteHeader } from '../components/SiteHeader'
+import { Footer } from '../components/Footer'
+import { Navbar } from '../components/Navbar'
 
 export function AppLayout() {
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-6 sm:px-6">
-      <SiteHeader />
-      <main className="mt-8 flex-1 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 lg:px-8">
+      <Navbar />
+      <main className="mt-6 flex-1 rounded-3xl border border-slate-200/70 bg-white/90 p-5 shadow-lg shadow-slate-200/60 backdrop-blur sm:p-8">
         <Outlet />
       </main>
+      <Footer />
     </div>
   )
 }

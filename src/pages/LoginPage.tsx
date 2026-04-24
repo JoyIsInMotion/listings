@@ -10,7 +10,10 @@ export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [email, setEmail] = useState('seller@example.com')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   const from = (location.state as LocationState | null)?.from ?? '/dashboard'
 
@@ -25,10 +28,22 @@ export function LoginPage() {
 
       <form
         className="space-y-4"
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault()
-          login(email)
-          navigate(from, { replace: true })
+          setError('')
+          setSubmitting(true)
+
+          try {
+            const nextUser = await login(email, password)
+            if (!nextUser) {
+              throw new Error('Sign in succeeded, but no session was returned.')
+            }
+            navigate(from, { replace: true })
+          } catch (submitError) {
+            setError(submitError instanceof Error ? submitError.message : 'Unable to sign in.')
+          } finally {
+            setSubmitting(false)
+          }
         }}
       >
         <label className="block space-y-1">
@@ -36,15 +51,30 @@ export function LoginPage() {
           <input
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            placeholder="seller@example.com"
             className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
           />
         </label>
 
+        <label className="block space-y-1">
+          <span className="text-sm font-semibold text-slate-700">Password</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Enter your password"
+            className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
+          />
+        </label>
+
+        {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
+
         <button
           type="submit"
+          disabled={submitting}
           className="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
         >
-          Login
+          {submitting ? 'Signing in...' : 'Login'}
         </button>
       </form>
 

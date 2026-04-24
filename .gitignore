@@ -26,6 +26,7 @@ dist-ssr
 # Local agent/tooling metadata
 .agents/
 skills-lock.json
+supabase/.temp/
 
 # Env files
 .env

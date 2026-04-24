@@ -38,10 +38,10 @@ export function Navbar() {
 
         {user ? (
           <>
-            <NavLink to="/dashboard" className={navLinkClassName}>
+            <NavLink to="/dashboard" end className={navLinkClassName}>
               My Books
             </NavLink>
-            <NavLink to="/dashboard/add" className={navLinkClassName}>
+            <NavLink to="/dashboard/publish" className={navLinkClassName}>
               Create Sale
             </NavLink>
             <button

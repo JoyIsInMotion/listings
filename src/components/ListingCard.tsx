@@ -7,18 +7,26 @@ type ListingCardProps = {
 
 export function ListingCard({ listing }: ListingCardProps) {
   const createdAt = new Date(listing.createdAt).toLocaleDateString('bg-BG')
+  const totalPhotos = listing.photoUrls.length
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-200/70">
+    <article className="group overflow-hidden rounded-2xl border border-amber-100/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-100/70">
       <div className="relative overflow-hidden">
         <img
           src={listing.imageUrl}
           alt={listing.title}
           className="h-44 w-full object-cover transition duration-500 group-hover:scale-105"
         />
-        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-slate-700 backdrop-blur">
-          {listing.condition}
-        </span>
+        {listing.condition ? (
+          <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-slate-700 backdrop-blur">
+            {listing.condition}
+          </span>
+        ) : null}
+        {totalPhotos > 1 ? (
+          <span className="absolute right-3 top-3 rounded-full bg-amber-100/90 px-2.5 py-1 text-xs font-semibold text-amber-900 backdrop-blur">
+            {totalPhotos} photos
+          </span>
+        ) : null}
       </div>
 
       <div className="space-y-3 p-4">

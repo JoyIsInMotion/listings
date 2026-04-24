@@ -46,7 +46,15 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'dashboard/add',
+        path: 'dashboard/publish',
+        element: (
+          <ProtectedRoute>
+            <CreateSalePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'publish',
         element: (
           <ProtectedRoute>
             <CreateSalePage />

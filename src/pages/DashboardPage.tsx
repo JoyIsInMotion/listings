@@ -1,11 +1,40 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ListingCard } from '../components/ListingCard'
 import { useAuth } from '../lib/auth'
-import { mockListings } from '../lib/mockListings'
+import { getMyListings } from '../lib/listings'
+import type { Listing } from '../types/listing'
 
 export function DashboardPage() {
   const { user } = useAuth()
-  const myListings = mockListings.filter((listing) => listing.ownerId === user?.id)
+  const [myListings, setMyListings] = useState<Listing[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!user?.id) {
+      setMyListings([])
+      setLoading(false)
+      return
+    }
+
+    let active = true
+
+    getMyListings(user.id)
+      .then((listings) => {
+        if (active) {
+          setMyListings(listings)
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [user?.id])
 
   return (
     <section className="space-y-6">
@@ -18,14 +47,18 @@ export function DashboardPage() {
         </div>
 
         <Link
-          to="/dashboard/add"
+          to="/dashboard/publish"
           className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
         >
           Create sale
         </Link>
       </div>
 
-      {myListings.length > 0 ? (
+      {loading ? (
+        <p className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+          Loading your listings...
+        </p>
+      ) : myListings.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2">
           {myListings.map((listing) => (
             <div key={listing.id} className="space-y-2">
@@ -51,7 +84,7 @@ export function DashboardPage() {
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center">
           <p className="text-sm text-slate-600">You do not have any books listed yet.</p>
           <Link
-            to="/dashboard/add"
+            to="/dashboard/publish"
             className="mt-3 inline-flex rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
             Add your first listing

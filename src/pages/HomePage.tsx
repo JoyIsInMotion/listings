@@ -1,15 +1,35 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ListingCard } from '../components/ListingCard'
-import { mockListings } from '../lib/mockListings'
-
-const latestListings = [...mockListings]
-  .sort(
-    (a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  )
-  .slice(0, 3)
+import { useAuth } from '../lib/auth'
+import { getLatestListings } from '../lib/listings'
+import type { Listing } from '../types/listing'
 
 export function HomePage() {
+  const { user } = useAuth()
+  const [latestListings, setLatestListings] = useState<Listing[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let active = true
+
+    getLatestListings(3)
+      .then((listings) => {
+        if (active) {
+          setLatestListings(listings)
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
   return (
     <section className="space-y-10">
       <div className="rounded-3xl border border-slate-200/80 bg-gradient-to-br from-sky-50 via-cyan-50 to-white p-6 shadow-sm sm:p-8">
@@ -34,7 +54,7 @@ export function HomePage() {
               Browse all books
             </Link>
             <Link
-              to="/register"
+              to={user ? '/publish' : '/register'}
               className="inline-flex rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900"
             >
               Start selling
@@ -50,11 +70,18 @@ export function HomePage() {
             See all
           </Link>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {latestListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
-          ))}
-        </div>
+
+        {loading ? (
+          <p className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            Loading latest books...
+          </p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {latestListings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

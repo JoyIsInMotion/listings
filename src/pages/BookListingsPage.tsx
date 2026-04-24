@@ -1,26 +1,39 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ListingCard } from '../components/ListingCard'
-import { mockListings } from '../lib/mockListings'
+import { filterListings, getAllListings } from '../lib/listings'
+import type { Listing } from '../types/listing'
 
 const pageSize = 4
 
 export function BookListingsPage() {
+  const [listings, setListings] = useState<Listing[]>([])
+  const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
 
-  const filteredListings = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase()
+  useEffect(() => {
+    let active = true
 
-    if (!normalizedQuery) {
-      return mockListings
+    getAllListings()
+      .then((rows) => {
+        if (active) {
+          setListings(rows)
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      active = false
     }
+  }, [])
 
-    return mockListings.filter(
-      (listing) =>
-        listing.title.toLowerCase().includes(normalizedQuery) ||
-        listing.location.toLowerCase().includes(normalizedQuery),
-    )
-  }, [query])
+  const filteredListings = useMemo(() => {
+    return filterListings(listings, query)
+  }, [listings, query])
 
   const totalPages = Math.max(1, Math.ceil(filteredListings.length / pageSize))
   const currentPage = Math.min(page, totalPages)
@@ -59,7 +72,11 @@ export function BookListingsPage() {
         </p>
       </div>
 
-      {pagedListings.length > 0 ? (
+      {loading ? (
+        <p className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+          Loading books from marketplace...
+        </p>
+      ) : pagedListings.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2">
           {pagedListings.map((listing) => (
             <ListingCard key={listing.id} listing={listing} />
